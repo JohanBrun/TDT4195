@@ -1,0 +1,1 @@
+/home/shomea/j/johabru/dev/gloom-rs/target/debug/gloom-rs: /home/shomea/j/johabru/dev/gloom-rs/src/main.rs /home/shomea/j/johabru/dev/gloom-rs/src/shader.rs /home/shomea/j/johabru/dev/gloom-rs/src/util.rs /home/shomea/j/johabru/dev/gloom-rs/target/debug/debug/build/gl-d401d6b64df8e5a3/out/bindings.rs
