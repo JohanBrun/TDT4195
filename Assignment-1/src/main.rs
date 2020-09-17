@@ -145,10 +145,8 @@ fn main() {
 
         let task2_vao_id: u32 = unsafe { set_up_vao(&vertices_2, &indices_2) };
 
-        // Basic usage of shader helper
-        // The code below returns a shader object, which contains the field .program_id
-        // The snippet is not enough to do the assignment, and will need to be modified (outside of just using the correct path)
-        // shader::ShaderBuilder::new().attach_file("./path/to/shader").link();
+
+        // Adding shaders
         let shader = unsafe {
             shader::ShaderBuilder::new()
                 .attach_file("./shaders/simple.vert")

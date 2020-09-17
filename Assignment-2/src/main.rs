@@ -40,14 +40,14 @@ fn offset<T>(n: u32) -> *const c_void {
 }
 
 // == // Modify and complete the function below for the first task
-unsafe fn set_up_vao(vertices: &Vec<f32>, indices: &Vec<u32>) -> u32 {
+unsafe fn set_up_vao(vertices: &Vec<f32>, indices: &Vec<u32>, colors: &Vec<f32>) -> u32 {
     let mut vao_id: u32 = 0;
     gl::GenVertexArrays(1, &mut vao_id);
     gl::BindVertexArray(vao_id);
 
-    let mut buffer_id: u32 = 0;
-    gl::GenBuffers(1, &mut buffer_id);
-    gl::BindBuffer(gl::ARRAY_BUFFER, buffer_id);
+    let mut vertex_buffer_id: u32 = 0;
+    gl::GenBuffers(1, &mut vertex_buffer_id);
+    gl::BindBuffer(gl::ARRAY_BUFFER, vertex_buffer_id);
     gl::BufferData(
         gl::ARRAY_BUFFER,
         byte_size_of_array(vertices),
@@ -67,6 +67,19 @@ unsafe fn set_up_vao(vertices: &Vec<f32>, indices: &Vec<u32>) -> u32 {
         pointer_to_array(indices),
         gl::STATIC_DRAW
     );
+
+    let mut color_buffer_id: u32 = 0;
+    gl::GenBuffers(1, &mut color_buffer_id);
+    gl::BindBuffer(gl::ARRAY_BUFFER, color_buffer_id);
+    gl::BufferData(
+        gl::ARRAY_BUFFER,
+        byte_size_of_array(colors),
+        pointer_to_array(colors),
+        gl::STATIC_DRAW
+    );
+
+    gl::VertexAttribPointer(1, 4, gl::FLOAT, gl::FALSE, 0, ptr::null());
+    gl::EnableVertexAttribArray(1);
 
     return vao_id;
 } 
@@ -108,47 +121,48 @@ fn main() {
         }
 
         // == // Set up your VAO here
-        let vertices: Vec<f32> = vec! [
+        let vertices: Vec<f32> = vec![
+            0.33, 0.1, 0.0,
+            0.67, 0.1, 0.0,
             0.5, 0.5, 0.0,
-            0.33, 0.0, 0.0,
-            0.67, 0.0, 0.0,
-            0.0, 0.33, 0.0,
-            0.0, 0.67, 0.0,
-            0.33, 1.0, 0.0,
-            0.67, 1.0, 0.0,
-            1.0, 0.33, 0.0,
-            1.0, 0.67, 0.0,
+            -0.33, 0.1, 0.0,
+            -0.67, 0.1, 0.0,
+            -0.5, 0.5, 0.0,
+            -0.33, -0.1, 0.0,
+            -0.67, -0.1, 0.0,
             -0.5, -0.5, 0.0,
-            -0.5, -0.25, 0.0,
-            -0.75, -0.75, 0.0
+            0.33, -0.1, 0.0,
+            0.67, -0.1, 0.0,
+            0.5, -0.5, 0.0
         ];
 
-        let indices: Vec<u32> = vec! [
+        let indices: Vec<u32> = vec![
             0, 1, 2,
-            0, 3, 4,
-            0, 5, 6,
-            0, 7, 8,
-            9, 10, 11,
+            5, 4, 3,
+            6, 7, 8,
+            11, 10, 9
         ];
 
-        let task1_vao_id: u32 = unsafe { set_up_vao(&vertices, &indices) };
-
-        let vertices_2: Vec<f32> = vec! [
-            0.6, -0.8, -1.0,
-            0.0, 0.4, 0.0,
-            -0.8, -0.2, 1.0    
+        let colors: Vec<f32> = vec![
+            0.0, 1.0, 1.0, 1.0,
+            1.0, 1.0, 1.0, 1.0,
+            1.0, 1.0, 1.0, 1.0,
+            1.0, 1.0, 1.0, 1.0,
+            1.0, 1.0, 1.0, 1.0,
+            1.0, 1.0, 1.0, 1.0,
+            1.0, 1.0, 1.0, 1.0,
+            1.0, 1.0, 1.0, 1.0,
+            1.0, 1.0, 1.0, 1.0,
+            1.0, 1.0, 1.0, 1.0,
+            1.0, 1.0, 1.0, 1.0,
+            1.0, 1.0, 1.0, 1.0,
         ];
 
-        let indices_2: Vec<u32> = vec! [
-            0, 1, 2
-        ];
+        unsafe {
+            set_up_vao(&vertices, &indices, &colors)
+        };
 
-        let task2_vao_id: u32 = unsafe { set_up_vao(&vertices_2, &indices_2) };
-
-        // Basic usage of shader helper
-        // The code below returns a shader object, which contains the field .program_id
-        // The snippet is not enough to do the assignment, and will need to be modified (outside of just using the correct path)
-        // shader::ShaderBuilder::new().attach_file("./path/to/shader").link();
+        // Adding shaders        
         let shader = unsafe {
             shader::ShaderBuilder::new()
                 .attach_file("./shaders/simple.vert")
@@ -195,7 +209,7 @@ fn main() {
 
                 // Issue the necessary commands to draw your scene here
 
-                gl::DrawElements(gl::TRIANGLES, 3, gl::UNSIGNED_INT, ptr::null());
+                gl::DrawElements(gl::TRIANGLES, 12, gl::UNSIGNED_INT, ptr::null());
 
 
 

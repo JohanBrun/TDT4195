@@ -1,1 +1,0 @@
-/home/shomea/j/johabru/dev/TDT4195/Assignment-1/target/debug/gloom-rs: /home/shomea/j/johabru/dev/TDT4195/Assignment-1/src/main.rs /home/shomea/j/johabru/dev/TDT4195/Assignment-1/src/shader.rs /home/shomea/j/johabru/dev/TDT4195/Assignment-1/src/util.rs /home/shomea/j/johabru/dev/TDT4195/Assignment-1/target/debug/debug/build/gl-d401d6b64df8e5a3/out/bindings.rs
