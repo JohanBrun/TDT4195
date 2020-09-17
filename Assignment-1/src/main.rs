@@ -134,9 +134,9 @@ fn main() {
         let task1_vao_id: u32 = unsafe { set_up_vao(&vertices, &indices) };
 
         let vertices_2: Vec<f32> = vec! [
-            0.6, -0.8, 0.0,
+            0.6, -0.8, -1.0,
             0.0, 0.4, 0.0,
-            -0.8, -0.2, 0.2    
+            -0.8, -0.2, 1.0    
         ];
 
         let indices_2: Vec<u32> = vec! [
