@@ -118,10 +118,14 @@ fn main() {
             gl::BlendFunc(gl::SRC_ALPHA, gl::ONE_MINUS_SRC_ALPHA);
             gl::Enable(gl::DEBUG_OUTPUT_SYNCHRONOUS);
             gl::DebugMessageCallback(Some(util::debug_callback), ptr::null());
+            gl::Enable(gl::DEPTH_TEST);
+            gl::DepthFunc(gl::LESS);
         }
 
         // == // Set up your VAO here
-        let vertices: Vec<f32> = vec![
+
+        // Task 1
+        let task1_vertices: Vec<f32> = vec![
             0.33, 0.1, 0.0,
             0.67, 0.1, 0.0,
             0.5, 0.5, 0.0,
@@ -136,14 +140,14 @@ fn main() {
             0.5, -0.5, 0.0
         ];
 
-        let indices: Vec<u32> = vec![
+        let task1_indices: Vec<u32> = vec![
             0, 1, 2,
             5, 4, 3,
             6, 7, 8,
             11, 10, 9
         ];
 
-        let colors: Vec<f32> = vec![
+        let task1_colors: Vec<f32> = vec![
             0.0, 1.0, 1.0, 1.0,
             1.0, 0.0, 1.0, 1.0,
             1.0, 1.0, 0.0, 1.0,
@@ -158,8 +162,39 @@ fn main() {
             0.97, 0.32, 0.38, 1.0,
         ];
 
+        let task2_vertices: Vec<f32> = vec![
+            -0.4, -0.33, -0.5,
+            0.2, -0.33, -0.5,
+            0.0, 0.2, -0.5,
+            -0.2, -0.33, 0.0,
+            0.4, -0.33, 0.0,
+            0.0, 0.2, 0.0,
+            0.0, -0.2, 0.5,
+            0.3, 0.33, 0.5,
+            -0.3, 0.33, 0.5
+        ];
+
+        let task2_indices: Vec<u32> = vec![
+            0, 1, 2,
+            3, 4, 5,
+            6, 7, 8
+        ];
+
+        let task2_colors: Vec<f32> = vec![
+            0.4, 0.8, 0.2, 0.5,
+            0.4, 0.8, 0.2, 0.5,
+            0.4, 0.8, 0.2, 0.5,
+            0.8, 0.4, 0.2, 0.5,
+            0.8, 0.4, 0.2, 0.5,
+            0.8, 0.4, 0.2, 0.5,
+            0.2, 0.4, 0.8, 0.5,
+            0.2, 0.4, 0.8, 0.5,
+            0.2, 0.4, 0.8, 0.5
+        ];
+
         unsafe {
-            set_up_vao(&vertices, &indices, &colors)
+            // set_up_vao(&task1_vertices, &task1_indices, &task1_colors)
+            set_up_vao(&task2_vertices, &task2_indices, &task2_colors)
         };
 
         // Adding shaders        
@@ -205,11 +240,11 @@ fn main() {
 
             unsafe {
                 gl::ClearColor(0.163, 0.163, 0.163, 1.0);
-                gl::Clear(gl::COLOR_BUFFER_BIT);
+                gl::Clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT);
 
                 // Issue the necessary commands to draw your scene here
 
-                gl::DrawElements(gl::TRIANGLES, 12, gl::UNSIGNED_INT, ptr::null());
+                gl::DrawElements(gl::TRIANGLES, 9, gl::UNSIGNED_INT, ptr::null());
 
 
 
