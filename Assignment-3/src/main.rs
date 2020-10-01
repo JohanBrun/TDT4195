@@ -162,6 +162,7 @@ fn main() {
             0.97, 0.32, 0.38, 1.0,
         ];
 
+        // Task 2
         let task2_vertices: Vec<f32> = vec![
             -0.4, -0.33, -0.5,
             0.2, -0.33, -0.5,
@@ -214,6 +215,13 @@ fn main() {
 
         let first_frame_time = std::time::Instant::now();
         let mut last_frame_time = first_frame_time;
+
+        // Initialize vector containing position and orientation of camera. Notation eta borrowed from TTK4190
+        // values are trans(x), trans(y), trans(z), rot(y), rot(x)
+        let mut eta: Vec<f32> = vec![
+            0.0, 0.0, -2.0, 0.0, 0.0
+        ];
+
         // The main rendering loop
         loop {
             let now = std::time::Instant::now();
@@ -226,12 +234,34 @@ fn main() {
                 for key in keys.iter() {
                     match key {
                         VirtualKeyCode::A => {
-                            _arbitrary_number += delta_time;
+                            eta[0] += delta_time;
                         },
                         VirtualKeyCode::D => {
-                            _arbitrary_number -= delta_time;
+                            eta[0] -= delta_time;
                         },
-
+                        VirtualKeyCode::W => {
+                            eta[2] += delta_time;
+                        },
+                        VirtualKeyCode::S => {
+                            eta[2] -= delta_time;
+                        },
+                        VirtualKeyCode::Space => {
+                            eta[1] -= delta_time;
+                        },
+                        VirtualKeyCode::LShift => {
+                            eta[1] += delta_time;
+                        },
+                        VirtualKeyCode::Up => {
+                            eta[3] -= delta_time;
+                        },
+                        VirtualKeyCode::Down => {
+                            eta[3] += delta_time;
+                        },VirtualKeyCode::Left => {
+                            eta[4] -= delta_time;
+                        },
+                        VirtualKeyCode::Right => {
+                            eta[4] += delta_time;
+                        },
 
                         _ => { }
                     }
@@ -242,8 +272,30 @@ fn main() {
                 gl::ClearColor(0.163, 0.163, 0.163, 1.0);
                 gl::Clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT);
 
-                // Issue the necessary commands to draw your scene here
+                // Task 4 uniform matrix to be passed to shader
+                let translate: glm::Mat4 = glm::mat4(
+                    1.0, 0.0, 0.0, eta[0], 
+                    0.0, 1.0, 0.0, eta[1], 
+                    0.0, 0.0, 1.0, eta[2], 
+                    0.0, 0.0, 0.0, 1.0,
+                );
+                let rotate_x: glm::Mat4 = glm::mat4(
+                    1.0, 0.0, 0.0, 0.0, 
+                    0.0, eta[3].cos(), -eta[3].sin(), 0.0, 
+                    0.0, eta[3].sin(), eta[3].cos(), 0.0, 
+                    0.0, 0.0, 0.0, 1.0,
+                );
+                let rotate_y: glm::Mat4 = glm::mat4(
+                    eta[4].cos(), 0.0, eta[4].sin(), 0.0, 
+                    0.0, 1.0, 0.0, 0.0, 
+                    -eta[4].sin(), 0.0, eta[4].cos(), 0.0, 
+                    0.0, 0.0, 0.0, 1.0,
+                );
+                let perspective_transform: glm::Mat4 = glm::perspective(1.0, 1.0, 1.0, 100.0);
 
+                gl::UniformMatrix4fv(5, 1, 0, (perspective_transform * rotate_y * rotate_x * translate).as_ptr());
+
+                // Issue the necessary commands to draw your scene here
                 gl::DrawElements(gl::TRIANGLES, 9, gl::UNSIGNED_INT, ptr::null());
 
 
