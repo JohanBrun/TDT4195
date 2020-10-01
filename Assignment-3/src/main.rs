@@ -11,6 +11,7 @@ use std::sync::{Mutex, Arc, RwLock};
 
 mod shader;
 mod util;
+mod mesh;
 
 use glutin::event::{Event, WindowEvent, KeyboardInput, ElementState::{Pressed, Released}, VirtualKeyCode::{self, *}};
 use glutin::event_loop::ControlFlow;
@@ -40,7 +41,7 @@ fn offset<T>(n: u32) -> *const c_void {
 }
 
 // == // Modify and complete the function below for the first task
-unsafe fn set_up_vao(vertices: &Vec<f32>, indices: &Vec<u32>, colors: &Vec<f32>) -> u32 {
+unsafe fn set_up_vao(vertices: &Vec<f32>, indices: &Vec<u32>, colors: &Vec<f32>, normals: &Vec<f32>) -> u32 {
     let mut vao_id: u32 = 0;
     gl::GenVertexArrays(1, &mut vao_id);
     gl::BindVertexArray(vao_id);
@@ -77,9 +78,22 @@ unsafe fn set_up_vao(vertices: &Vec<f32>, indices: &Vec<u32>, colors: &Vec<f32>)
         pointer_to_array(colors),
         gl::STATIC_DRAW
     );
-
+    
     gl::VertexAttribPointer(1, 4, gl::FLOAT, gl::FALSE, 0, ptr::null());
     gl::EnableVertexAttribArray(1);
+
+    let mut normal_buffer_id: u32 = 0;
+    gl::GenBuffers(1, &mut normal_buffer_id);
+    gl::BindBuffer(gl::ARRAY_BUFFER, normal_buffer_id);
+    gl::BufferData(
+        gl::ARRAY_BUFFER,
+        byte_size_of_array(normals),
+        pointer_to_array(normals),
+        gl::STATIC_DRAW
+    );
+
+    gl::VertexAttribPointer(2, 3, gl::FLOAT, gl::FALSE, 0, ptr::null());
+    gl::EnableVertexAttribArray(2);
 
     return vao_id;
 } 
@@ -124,79 +138,8 @@ fn main() {
 
         // == // Set up your VAO here
 
-        // Task 1
-        let task1_vertices: Vec<f32> = vec![
-            0.33, 0.1, 0.0,
-            0.67, 0.1, 0.0,
-            0.5, 0.5, 0.0,
-            -0.33, 0.1, 0.0,
-            -0.67, 0.1, 0.0,
-            -0.5, 0.5, 0.0,
-            -0.33, -0.1, 0.0,
-            -0.67, -0.1, 0.0,
-            -0.5, -0.5, 0.0,
-            0.33, -0.1, 0.0,
-            0.67, -0.1, 0.0,
-            0.5, -0.5, 0.0
-        ];
-
-        let task1_indices: Vec<u32> = vec![
-            0, 1, 2,
-            5, 4, 3,
-            6, 7, 8,
-            11, 10, 9
-        ];
-
-        let task1_colors: Vec<f32> = vec![
-            0.0, 1.0, 1.0, 1.0,
-            1.0, 0.0, 1.0, 1.0,
-            1.0, 1.0, 0.0, 1.0,
-            0.5, 0.5, 1.0, 1.0,
-            0.5, 1.0, 0.5, 1.0,
-            1.0, 0.5, 0.5, 1.0,
-            1.0, 1.0, 1.0, 0.25,
-            1.0, 1.0, 1.0, 0.5,
-            1.0, 1.0, 1.0, 0.75,
-            0.31, 0.41, 0.59, 1.0,
-            0.26, 0.53, 0.58, 1.0,
-            0.97, 0.32, 0.38, 1.0,
-        ];
-
-        // Task 2
-        let task2_vertices: Vec<f32> = vec![
-            -0.4, -0.33, -0.5,
-            0.2, -0.33, -0.5,
-            0.0, 0.2, -0.5,
-            -0.2, -0.33, 0.0,
-            0.4, -0.33, 0.0,
-            0.0, 0.2, 0.0,
-            0.0, -0.2, 0.5,
-            0.3, 0.33, 0.5,
-            -0.3, 0.33, 0.5
-        ];
-
-        let task2_indices: Vec<u32> = vec![
-            0, 1, 2,
-            3, 4, 5,
-            6, 7, 8
-        ];
-
-        let task2_colors: Vec<f32> = vec![
-            0.4, 0.8, 0.2, 0.5,
-            0.4, 0.8, 0.2, 0.5,
-            0.4, 0.8, 0.2, 0.5,
-            0.8, 0.4, 0.2, 0.5,
-            0.8, 0.4, 0.2, 0.5,
-            0.8, 0.4, 0.2, 0.5,
-            0.2, 0.4, 0.8, 0.5,
-            0.2, 0.4, 0.8, 0.5,
-            0.2, 0.4, 0.8, 0.5
-        ];
-
-        unsafe {
-            // set_up_vao(&task1_vertices, &task1_indices, &task1_colors)
-            set_up_vao(&task2_vertices, &task2_indices, &task2_colors)
-        };
+        let terrain = mesh::Terrain::load("./resources/lunarsurface.obj");
+        let terrain_vao = unsafe { set_up_vao(&terrain.vertices, &terrain.indices, &terrain.colors, &terrain.normals) };
 
         // Adding shaders        
         let shader = unsafe {
@@ -234,22 +177,22 @@ fn main() {
                 for key in keys.iter() {
                     match key {
                         VirtualKeyCode::A => {
-                            eta[0] += delta_time;
+                            eta[0] += 20.0 * delta_time;
                         },
                         VirtualKeyCode::D => {
-                            eta[0] -= delta_time;
+                            eta[0] -= 20.0 * delta_time;
                         },
                         VirtualKeyCode::W => {
-                            eta[2] += delta_time;
+                            eta[2] += 20.0 * delta_time;
                         },
                         VirtualKeyCode::S => {
-                            eta[2] -= delta_time;
+                            eta[2] -= 20.0 * delta_time;
                         },
                         VirtualKeyCode::Space => {
-                            eta[1] -= delta_time;
+                            eta[1] -= 20.0 * delta_time;
                         },
                         VirtualKeyCode::LShift => {
-                            eta[1] += delta_time;
+                            eta[1] += 20.0 * delta_time;
                         },
                         VirtualKeyCode::Up => {
                             eta[3] -= delta_time;
@@ -291,12 +234,13 @@ fn main() {
                     -eta[4].sin(), 0.0, eta[4].cos(), 0.0, 
                     0.0, 0.0, 0.0, 1.0,
                 );
-                let perspective_transform: glm::Mat4 = glm::perspective(1.0, 1.0, 1.0, 100.0);
+                let perspective_transform: glm::Mat4 = glm::perspective(1.0, 1.0, 1.0, 1000.0);
 
-                gl::UniformMatrix4fv(5, 1, 0, (perspective_transform * rotate_y * rotate_x * translate).as_ptr());
+                gl::UniformMatrix4fv(5, 1, 0, (perspective_transform * rotate_x * rotate_y * translate).as_ptr());
 
                 // Issue the necessary commands to draw your scene here
-                gl::DrawElements(gl::TRIANGLES, 9, gl::UNSIGNED_INT, ptr::null());
+                gl::BindVertexArray(terrain_vao);
+                gl::DrawElements(gl::TRIANGLES, terrain.index_count, gl::UNSIGNED_INT, ptr::null());
 
 
 
