@@ -9,6 +9,7 @@ out vec3 vertex_normal;
 
 // Task 4
 uniform layout(location=5) mat4 transform_matrix;
+uniform layout(location=6) mat4 normal_transformation;
 
 void main()
 {
