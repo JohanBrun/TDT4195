@@ -241,10 +241,6 @@ fn main() {
                 // Issue the necessary commands to draw your scene here
                 gl::BindVertexArray(terrain_vao);
                 gl::DrawElements(gl::TRIANGLES, terrain.index_count, gl::UNSIGNED_INT, ptr::null());
-
-
-
-                
             }
 
             context.swap_buffers().unwrap();
